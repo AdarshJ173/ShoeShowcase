@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELEVATE | Premium Footwear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #222;
+            overflow-x: hidden;
+        }
+
+        .shoe-container {
+            perspective: 1000px;
+        }
+
+        .shoe-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .hero-section {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .parallax-bg {
+            position: absolute;
+            width: 100%;
+            height: 120%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-20px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        .split-text {
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .split-text span {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        .section-title {
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #222;
+        }
+
+        .shoe-feature-card {
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .shoe-feature-card.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .shoe-showcase-item {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .shoe-showcase-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #three-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed w-full py-6 px-8 lg:px-16 flex justify-between items-center z-50 bg-white bg-opacity-90 backdrop-filter backdrop-blur-sm">
+        <div class="text-2xl font-bold tracking-tighter">ELEVATE</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="#home" class="hover:text-gray-600 transition">Home</a>
+            <a href="#collection" class="hover:text-gray-600 transition">Collection</a>
+            <a href="#features" class="hover:text-gray-600 transition">Features</a>
+            <a href="#about" class="hover:text-gray-600 transition">About</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="p-2 rounded-full hover:bg-gray-100 transition">
+                <i class="fas fa-shopping-bag"></i>
+            </button>
+            <button class="md:hidden p-2 rounded-full hover:bg-gray-100 transition">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section flex items-center justify-center text-white relative">
+        <div id="three-container"></div>
+        <div class="gradient-overlay"></div>
+        <div class="container mx-auto px-6 lg:px-16 relative z-10">
+            <div class="max-w-2xl">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                    <span class="split-text">
+                        <span class="word">Redefine</span>
+                    </span>
+                    <br>
+                    <span class="split-text">
+                        <span class="word">Your</span>
+                    </span>
+                    <br>
+                    <span class="split-text">
+                        <span class="word">Movement</span>
+                    </span>
+                </h1>
+                <p class="text-lg md:text-xl mb-8 opacity-90 max-w-lg">
+                    Experience unparalleled comfort and style with our precision-engineered footwear collection.
+                </p>
+                <div class="flex space-x-4">
+                    <button class="px-8 py-3 bg-white text-black font-medium rounded-full hover:bg-opacity-90 transition">
+                        Explore Collection
+                    </button>
+                    <button class="px-8 py-3 border border-white text-white font-medium rounded-full hover:bg-white hover:bg-opacity-10 transition">
+                        View Video
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-down">
+            <div class="text-sm mb-2">SCROLL DOWN</div>
+            <div class="w-4 h-8 border-2 border-white rounded-full mx-auto relative">
+                <div class="w-1 h-2 bg-white rounded-full absolute top-1 left-1/2 transform -translate-x-1/2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collection Showcase -->
+    <section id="collection" class="py-24 bg-white">
+        <div class="container mx-auto px-6 lg:px-16">
+            <div class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title">Signature Collection</h2>
+                <p class="text-gray-600 max-w-2xl">
+                    Each piece in our collection is crafted with precision, using only the finest materials for unmatched quality and durability.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                <!-- Shoe Card 1 -->
+                <div class="shoe-showcase-item">
+                    <div class="shoe-container h-80 mb-6 flex items-center justify-center">
+                        <div class="shoe-3d w-full h-full" id="shoe1">
+                            <img src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Premium Sneaker" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Aether X</h3>
+                    <p class="text-gray-600 mb-4">The ultimate fusion of performance and urban style</p>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold">$229</span>
+                        <button class="px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition">
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shoe Card 2 -->
+                <div class="shoe-showcase-item" style="transition-delay: 0.2s;">
+                    <div class="shoe-container h-80 mb-6 flex items-center justify-center">
+                        <div class="shoe-3d w-full h-full" id="shoe2">
+                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Classic Runner" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Nova Prime</h3>
+                    <p class="text-gray-600 mb-4">Heritage design meets modern technology</p>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold">$189</span>
+                        <button class="px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition">
+                            Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shoe Card 3 -->
+                <div class="shoe-showcase-item" style="transition-delay: 0.4s;">
+                    <div class="shoe-container h-80 mb-6 flex items-center justify-center">
+                        <div class="shoe-3d w-full h-full" id="shoe3">
+                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Performance Trainer" class="w-full h-full object-contain">
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Orion RS</h3>
+                    <p class="text-gray-600 mb-4">High-performance footwear for the modern athlete</p>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold">$249</span>
+                        <button class="px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Full Width Shoe Showcase -->
+    <section class="relative h-screen flex items-center">
+        <div class="absolute inset-0 bg-gray-100 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80" alt="Featured Shoe" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent opacity-80"></div>
+        </div>
+        <div class="container mx-auto px-6 lg:px-16 relative z-10 text-white max-w-2xl">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Limited Edition</h2>
+            <h3 class="text-3xl font-semibold mb-6">Solaris Phantom</h3>
+            <p class="text-lg mb-8 opacity-90">
+                Our limited edition masterpiece, featuring premium Italian leather and our proprietary rebound technology for all-day comfort.
+            </p>
+            <div class="flex items-center space-x-6">
+                <div>
+                    <div class="text-xs opacity-70 mb-1">STARTING FROM</div>
+                    <div class="text-2xl font-bold">$349</div>
+                </div>
+                <button class="px-8 py-3 bg-white text-black font-medium rounded-full hover:bg-opacity-90 transition">
+                    Pre-order Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-gray-50">
+        <div class="container mx-auto px-6 lg:px-16">
+            <div class="mb-16 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 section-title inline-block">Engineered Excellence</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    Discover the cutting-edge technologies that set our footwear apart from the competition.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="shoe-feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-atom text-2xl text-gray-700"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Rebound Core™</h3>
+                    <p class="text-gray-600">
+                        Our proprietary cushioning system provides energy return with every step, reducing fatigue during long wears.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="shoe-feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-wind text-2xl text-gray-700"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">AeroWeave™</h3>
+                    <p class="text-gray-600">
+                        Ultra-breathable yet durable fabric technology that adapts to your foot's temperature and movement.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="shoe-feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-lg transition-all">
+                    <div class="w-16 h-16 mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                        <i class="fas fa-leaf text-2xl text-gray-700"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">EcoForm™</h3>
+                    <p class="text-gray-600">
+                        Sustainable materials crafted from recycled ocean plastics without compromising on quality or performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3D Shoe Configurator -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6 lg:px-16">
+            <div class="flex flex-col lg:flex-row items-center">
+                <div class="lg:w-1/2 lg:pr-16 mb-12 lg:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 section-title">Customize Your Pair</h2>
+                    <p class="text-gray-600 mb-8">
+                        Create a shoe as unique as you are with our 3D configurator. Choose from premium materials, colors, and custom detailing options.
+                    </p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-medium mb-2">Material</h3>
+                            <div class="flex space-x-3">
+                                <button class="w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-gray-400 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-blue-900 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-brown-800 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-white border-2 border-gray-300 focus:border-black"></button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium mb-2">Sole</h3>
+                            <div class="flex space-x-3">
+                                <button class="w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-white border-2 border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-gray-200 border-2 border-gray-300 focus:border-black"></button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium mb-2">Accents</h3>
+                            <div class="flex space-x-3">
+                                <button class="w-8 h-8 rounded-full bg-red-600 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-yellow-500 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-blue-500 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-green-500 border-2 border-gray-300 focus:border-black"></button>
+                                <button class="w-8 h-8 rounded-full bg-black border-2 border-gray-300 focus:border-black"></button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="font-medium mb-2">Personalization</h3>
+                            <input type="text" placeholder="Your initials (max 3 letters)" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="shoe-container w-full h-96 lg:h-[32rem]">
+                        <div class="shoe-3d w-full h-full bg-gray-100 rounded-xl overflow-hidden shadow-xl" id="custom-shoe">
+                            <div class="w-full h-full flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Custom Shoe" class="w-full h-full object-contain">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-gray-900 text-white">
+        <div class="container mx-auto px-6 lg:px-16">
+            <div class="flex flex-col lg:flex-row">
+                <div class="lg:w-1/2 lg:pr-16 mb-12 lg:mb-0">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 section-title">About ELEVATE</h2>
+                    <p class="mb-6 text-gray-300">
+                        Founded in 2023, ELEVATE was born from a passion for blending performance footwear with high fashion. Our team of engineers, designers, and athletes work tirelessly to push the boundaries of what footwear can be.
+                    </p>
+                    <p class="mb-8 text-gray-300">
+                        Every pair in our collection undergoes rigorous testing to ensure durability, comfort, and style. We partner with ethical suppliers to source only the finest materials.
+                    </p>
+                    <button class="px-8 py-3 bg-white text-black font-medium rounded-full hover:bg-opacity-90 transition">
+                        Our Story
+                    </button>
+                </div>
+                <div class="lg:w-1/2">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <div class="text-3xl font-bold mb-2 text-blue-400">200+</div>
+                            <div class="text-gray-300">Hours of testing per pair</div>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <div class="text-3xl font-bold mb-2 text-blue-400">87%</div>
+                            <div class="text-gray-300">Recycled materials used</div>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg col-span-2">
+                            <div class="text-3xl font-bold mb-2 text-blue-400">10K+</div>
+                            <div class="text-gray-300">Happy customers worldwide</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6 lg:px-16 text-center">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4">Join Our Community</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto mb-8">
+                Subscribe to receive updates on new releases, exclusive offers, and style inspiration.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center max-w-md mx-auto gap-3">
+                <input type="email" placeholder="Your email address" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black flex-grow">
+                <button class="px-6 py-3 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition whitespace-nowrap">
+                    Subscribe
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-6 lg:px-16">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-white text-lg font-medium mb-4">Shop</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Men</a></li>
+                        <li><a href="#" class="hover:text-white transition">Women</a></li>
+                        <li><a href="#" class="hover:text-white transition">New Arrivals</a></li>
+                        <li><a href="#" class="hover:text-white transition">Best Sellers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-medium mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Our Story</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sustainability</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-medium mb-4">Help</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Customer Service</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Returns & Exchanges</a></li>
+                        <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white text-lg font-medium mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                            <i class="fab fa-pinterest-p"></i>
+                        </a>
+                    </div>
+                    <p>
+                        <a href="mailto:hello@elevate-footwear.com" class="hover:text-white transition">hello@elevate-footwear.com</a>
+                    </p>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    &copy; 2023 ELEVATE Footwear. All rights reserved.
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize GSAP and ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Split text animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroTitle = document.querySelector('.hero-section h1');
+            const words = heroTitle.querySelectorAll('.word');
+            
+            words.forEach(word => {
+                const letters = word.textContent.split('');
+                word.innerHTML = '';
+                letters.forEach(letter => {
+                    const span = document.createElement('span');
+                    span.textContent = letter;
+                    span.style.display = 'inline-block';
+                    span.style.transform = 'translateY(100%)';
+                    span.style.opacity = '0';
+                    word.appendChild(span);
+                });
+            });
+
+            gsap.to(heroTitle.querySelectorAll('span'), {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.03,
+                ease: 'power4.out'
+            });
+        });
+
+        // Show elements on scroll
+        const shoeShowcaseItems = document.querySelectorAll('.shoe-showcase-item');
+        shoeShowcaseItems.forEach(item => {
+            gsap.fromTo(item, 
+                { opacity: 0, y: 50 },
+                { 
+                    opacity: 1, 
+                    y: 0,
+                    duration: 0.8,
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    }
+                }
+            );
+        });
+
+        const featureCards = document.querySelectorAll('.shoe-feature-card');
+        featureCards.forEach((card, index) => {
+            gsap.fromTo(card, 
+                { opacity: 0, y: 20 },
+                { 
+                    opacity: 1, 
+                    y: 0,
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    }
+                }
+            );
+        });
+
+        // 3D hover effect for shoes
+        const shoeContainers = document.querySelectorAll('.shoe-container');
+        shoeContainers.forEach(container => {
+            const shoe = container.querySelector('.shoe-3d');
+            
+            container.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                shoe.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+            
+            container.addEventListener('mouseenter', () => {
+                shoe.style.transition = 'transform 0.1s ease';
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                shoe.style.transition = 'transform 0.5s ease';
+                shoe.style.transform = 'rotateY(0deg) rotateX(0deg)';
+            });
+        });
+
+        // Simple Three.js scene for hero section
+        function initThreeJS() {
+            const container = document.getElementById('three-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Add lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Add geometry
+            const geometry = new THREE.IcosahedronGeometry(2, 1);
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x222222,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            camera.position.z = 5;
+
+            // Mouse movement
+            let mouseX = 0;
+            let mouseY = 0;
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.x += 0.005;
+                mesh.rotation.y += 0.005;
+                mesh.position.x = mouseX * 0.5;
+                mesh.position.y = mouseY * 0.5;
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', () => {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            });
+        }
+
+        // Initialize Three.js scene
+        if (document.getElementById('three-container')) {
+            initThreeJS();
+        }
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=AAJ007/shoe-showcase" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
